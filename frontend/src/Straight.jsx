@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { PerspectiveCamera, Edges } from "@react-three/drei";
 import { useRef, useEffect } from "react";
-import { Leva , useControls } from "leva";
+// import { Leva , useControls } from "leva";
 
 export default function Elevator3D() {
   const cameraRef = useRef();

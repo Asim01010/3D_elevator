@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+// import Elevator3D from "./Elevator3D";
+import Elevator3D from "./Straight";
 // Material library
 const MATERIALS = {
   stainless: { name: "Stainless Steel", color: "#C5C9CC" },
@@ -609,226 +610,29 @@ const ElevatorConfigurator = () => {
             padding: "40px",
           }}
         >
-          <svg
-            viewBox="0 0 800 600"
-            style={{ width: "90%", maxWidth: "900px" }}
-          >
-            {/* Ceiling */}
-            <polygon
-              points="150,100 650,100 750,150 250,150"
-              fill="#fafafa"
-              stroke="#888"
-              strokeWidth="2"
-            />
 
-            {/* Ceiling lights */}
-            <circle cx="300" cy="115" r="15" fill="#fff" stroke="#aaa" />
-            <circle cx="400" cy="120" r="15" fill="#fff" stroke="#aaa" />
-            <circle cx="500" cy="120" r="15" fill="#fff" stroke="#aaa" />
-            <circle cx="600" cy="125" r="15" fill="#fff" stroke="#aaa" />
-
-            {/* Back Wall - with zones */}
-            <polygon
-              points="150,100 650,100 650,450 150,450"
-              fill={getZoneColor("A")}
-              stroke="#666"
-              strokeWidth="2"
-            />
-
-            {/* Back wall panels */}
-            <rect
-              x="170"
-              y="120"
-              width="140"
-              height="150"
-              fill={getZoneColor("1")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="240"
-              y="200"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              1
-            </text>
-
-            <rect
-              x="330"
-              y="120"
-              width="140"
-              height="150"
-              fill={getZoneColor("B")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="400"
-              y="200"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              B
-            </text>
-
-            <rect
-              x="490"
-              y="120"
-              width="140"
-              height="150"
-              fill={getZoneColor("2")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="560"
-              y="200"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              2
-            </text>
-
-            <rect
-              x="170"
-              y="290"
-              width="140"
-              height="140"
-              fill={getZoneColor("C")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="240"
-              y="365"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              C
-            </text>
-
-            <rect
-              x="330"
-              y="290"
-              width="140"
-              height="140"
-              fill={getZoneColor("D")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="400"
-              y="365"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              D
-            </text>
-
-            <rect
-              x="490"
-              y="290"
-              width="140"
-              height="140"
-              fill={getZoneColor("C")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="560"
-              y="365"
-              fontSize="40"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              C
-            </text>
-
-            {/* Right Wall - visible side */}
-            <polygon
-              points="650,100 750,150 750,500 650,450"
-              fill={getZoneColor("3")}
-              stroke="#666"
-              strokeWidth="2"
-            />
-
-            {/* Right wall panel */}
-            <polygon
-              points="660,180 740,220 740,350 660,310"
-              fill={getZoneColor("3")}
-              stroke="#888"
-              strokeWidth="2"
-            />
-            <text
-              x="680"
-              y="270"
-              fontSize="36"
-              fill="#7bc043"
-              fontWeight="bold"
-            >
-              3
-            </text>
-
-            {/* Floor */}
-            <polygon
-              points="150,450 650,450 750,500 250,500"
-              fill="#f5f5f5"
-              stroke="#888"
-              strokeWidth="2"
-            />
-
-            {/* Left Wall outline */}
-            <line
-              x1="150"
-              y1="100"
-              x2="250"
-              y2="150"
-              stroke="#666"
-              strokeWidth="2"
-            />
-            <line
-              x1="150"
-              y1="450"
-              x2="250"
-              y2="500"
-              stroke="#666"
-              strokeWidth="2"
-            />
-            <line
-              x1="250"
-              y1="150"
-              x2="250"
-              y2="500"
-              stroke="#666"
-              strokeWidth="2"
-            />
-
-            {/* Handrail indicators */}
-            <line
-              x1="260"
-              y1="300"
-              x2="640"
-              y2="300"
-              stroke="#888"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            <line
-              x1="660"
-              y1="305"
-              x2="740"
-              y2="340"
-              stroke="#888"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-          </svg>
+        <Elevator3D/>
+        {/* <Elevator3D/> */}
+          {/* sufgskgafgjahsjdfhgkjh
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+          sdfgsdkfjgsdkfghsdkfjghsdkg
+           */}
         </div>
 
         {/* Watermark */}
@@ -852,7 +656,7 @@ const ElevatorConfigurator = () => {
           style={{
             position: "absolute",
             bottom: "30px",
-            left: "30px",
+            left: "10px",
             background: "rgba(255,255,255,0.95)",
             padding: "15px 20px",
             borderRadius: "8px",
