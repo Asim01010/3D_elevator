@@ -784,7 +784,7 @@ export default function Elevator3D() {
         </Canvas>
 
         {/* Instructions */}
-        <div
+        {/* <div
           style={{
             position: "absolute",
             bottom: "20px",
@@ -796,8 +796,8 @@ export default function Elevator3D() {
             maxWidth: "300px",
             fontSize: "12px",
           }}
-        >
-          <div
+        > */}
+          {/* <div
             style={{
               fontWeight: "bold",
               marginBottom: "8px",
@@ -816,8 +816,8 @@ export default function Elevator3D() {
             <strong>G</strong>: Left Accent | <strong>H</strong>: Button Panel
             <br />
             <strong>1-3</strong>: Wall Sub-panels
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </div>
     </div>
   );
