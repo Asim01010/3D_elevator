@@ -610,29 +610,6 @@ const ElevatorConfigurator = () => {
             padding: "40px",
           }}
         >
-
-        <Elevator3D/>
-        {/* <Elevator3D/> */}
-          {/* sufgskgafgjahsjdfhgkjh
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-          sdfgsdkfjgsdkfghsdkfjghsdkg
-           */}
         </div>
 
         {/* Watermark */}
