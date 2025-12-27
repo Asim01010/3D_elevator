@@ -65,12 +65,14 @@ export default function Elevator3D() {
     }
   }, [viewMode]);
 
-  const applyMaterialToZone = (material) => {
-    if (selectedZone) {
-      setConfig((prev) => ({ ...prev, [selectedZone]: material }));
-      setSelectedMaterial(material);
-    }
-  };
+const applyMaterialToZone = (material) => {
+  if (selectedZone) {
+    // Apply the material immediately
+    setConfig((prev) => ({ ...prev, [selectedZone]: material }));
+    // Update the selected material for border highlight
+    setSelectedMaterial(material);
+  }
+};
 
   const handleZoneSelect = (zone) => {
     if (["A", "B", "C"].includes(zone)) {
@@ -559,12 +561,17 @@ export default function Elevator3D() {
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       border:
-                        selectedMaterial === mat
-                          ? "3px solid #7bc043"
-                          : "1px solid #555",
-                      borderRadius: "4px",
+                        config[selectedZone] === mat
+                          ? "4px solid #7bc043"
+                          : "2px solid #666",
+                      borderRadius: "6px",
                       cursor: selectedZone ? "pointer" : "not-allowed",
-                      opacity: selectedZone ? 1 : 0.5,
+                      opacity: selectedZone ? 1 : 0.6,
+                      boxShadow:
+                        config[selectedZone] === mat
+                          ? "0 0 12px rgba(123, 192, 67, 0.7)"
+                          : "none",
+                      transition: "all 0.2s ease",
                     }}
                     title={MATERIALS[mat].name}
                   />
@@ -601,9 +608,13 @@ export default function Elevator3D() {
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       border:
-                        selectedMaterial === mat
-                          ? "3px solid #7bc043"
-                          : "1px solid #555",
+                        config[selectedZone] === mat
+                          ? "4px solid #7bc043"
+                          : "2px solid #666",
+                      boxShadow:
+                        config[selectedZone] === mat
+                          ? "0 0 10px rgba(123, 192, 67, 0.6)"
+                          : "none",
                       borderRadius: "4px",
                       cursor: selectedZone ? "pointer" : "not-allowed",
                       opacity: selectedZone ? 1 : 0.5,
