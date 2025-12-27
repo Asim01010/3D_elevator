@@ -1,5 +1,10 @@
 import { Canvas } from "@react-three/fiber";
-import { PerspectiveCamera, Edges, useTexture } from "@react-three/drei";
+import {
+  PerspectiveCamera,
+  Edges,
+  useTexture,
+  Environment,
+} from "@react-three/drei";
 import { useState, useRef, useEffect } from "react";
 
 const MATERIALS = {
@@ -20,8 +25,10 @@ const MATERIALS = {
 export default function Elevator3D() {
   const [viewMode, setViewMode] = useState("front");
   const [selectedZone, setSelectedZone] = useState(null);
+  const [currentWall, setCurrentWall] = useState(null); // New: tracks selected wall (A/B/C)
   const [selectedMaterial, setSelectedMaterial] = useState("stainless");
   const [config, setConfig] = useState({
+    // Whole walls
     A: "woodLight",
     B: "stainless",
     C: "stainless",
@@ -30,9 +37,24 @@ export default function Elevator3D() {
     F: "stainless",
     G: "stainless",
     H: "stainless",
-    1: "woodLight",
-    2: "woodLight",
-    3: "woodLight",
+    // Wall A sub-panels
+    A1: "woodLight",
+    A2: "woodLight",
+    A3: "woodLight",
+    A4: "woodLight",
+    A5: "woodLight",
+    // Wall B sub-panels
+    B1: "stainless",
+    B2: "stainless",
+    B3: "stainless",
+    B4: "stainless",
+    B5: "stainless",
+    // Wall C sub-panels
+    C1: "stainless",
+    C2: "stainless",
+    C3: "stainless",
+    C4: "stainless",
+    C5: "stainless",
   });
 
   const cameraRef = useRef();
@@ -50,6 +72,22 @@ export default function Elevator3D() {
     }
   };
 
+  const handleZoneSelect = (zone) => {
+    if (["A", "B", "C"].includes(zone)) {
+      setCurrentWall(zone);
+      setSelectedZone(zone); // Select whole wall
+    } else {
+      setSelectedZone(zone);
+    }
+  };
+
+  const handleSubPanelSelect = (num) => {
+    if (currentWall) {
+      const subZone = currentWall + num;
+      setSelectedZone(subZone);
+    }
+  };
+
   const getCameraPosition = () =>
     viewMode === "front" ? [0, 2, 7] : [0, 2, 6.5];
 
@@ -57,9 +95,8 @@ export default function Elevator3D() {
     viewMode === "front" ? [-0.05, Math.PI / 4.5, 0] : [0, 0, 0];
 
   const zones = ["A", "B", "C", "D", "E", "F", "G", "H"];
-  const subPanels = ["1", "2", "3"];
+  const subPanels = ["1", "2", "3", "4", "5"];
 
-  // 3D Scene - useTexture is now safely inside Canvas
   function Scene() {
     const textures = useTexture({
       stainless: "/download.jpeg",
@@ -74,14 +111,14 @@ export default function Elevator3D() {
         map: textures[matKey],
         metalness: mat.metalness,
         roughness: mat.roughness,
+        envMapIntensity: 1.5, // Boost reflections for realism
       };
     };
 
     const CeilingPanel = ({ position }) => {
-      const gridLines = 3;
       const lights = [];
-      for (let i = 0; i < gridLines; i++) {
-        for (let j = 0; j < gridLines; j++) {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
           lights.push({
             x: (i - 1) * (4 / 3),
             z: (j - 1) * (3 / 3),
@@ -91,47 +128,16 @@ export default function Elevator3D() {
 
       return (
         <group position={position}>
-          <mesh onClick={() => setSelectedZone("E")}>
+          <mesh onClick={() => handleZoneSelect("E")}>
             <boxGeometry args={[4, 0.08, 3]} />
             <meshStandardMaterial {...getZoneMaterial("E")} side={2} />
             <Edges color="#999" />
           </mesh>
 
-          {[...Array(gridLines - 1)].map((_, i) => (
-            <mesh
-              key={`h-${i}`}
-              position={[0, -0.04, (i + 1 - gridLines / 2) * (3 / gridLines)]}
-            >
-              <boxGeometry args={[4 - 0.1, 0.02, 0.03]} />
-              <meshStandardMaterial color="#bbb" />
-            </mesh>
-          ))}
-
-          {[...Array(gridLines - 1)].map((_, i) => (
-            <mesh
-              key={`v-${i}`}
-              position={[(i + 1 - gridLines / 2) * (4 / gridLines), -0.04, 0]}
-            >
-              <boxGeometry args={[0.03, 0.02, 3 - 0.1]} />
-              <meshStandardMaterial color="#bbb" />
-            </mesh>
-          ))}
-
           {lights.map((light, idx) => (
             <group key={idx} position={[light.x, -0.06, light.z]}>
-              <mesh
-                name="BackWall"
-                userData={{ zone: "A", label: "Back Wall Panel" }}
-                onPointerOver={(e) => {
-                  e.stopPropagation();
-                  console.log("Hovered mesh:", e.object);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log("Clicked mesh:", e.object.name);
-                  console.log("Zone:", e.object.userData.zone);
-                }}
-              >
+              {/* Visual light fixture */}
+              <mesh>
                 <cylinderGeometry args={[0.1, 0.15, 0.04, 20]} />
                 <meshStandardMaterial color="#ddd" />
               </mesh>
@@ -140,36 +146,19 @@ export default function Elevator3D() {
                 <meshStandardMaterial
                   color="#fffbf0"
                   emissive="#fffbf0"
-                  emissiveIntensity={0.8}
+                  emissiveIntensity={0.4}
                 />
               </mesh>
+              {/* Actual point light for realism */}
+              <pointLight
+                position={[0.01, -0.01, 0]}
+                intensity={0.6}
+                color="#fffae6"
+                distance={2}
+                decay={3}
+                castShadow
+              />
             </group>
-          ))}
-        </group>
-      );
-    };
-
-    const WallPanel = ({
-      position,
-      width,
-      height,
-      rotation,
-      visible = true,
-      zone,
-    }) => {
-      if (!visible) return null;
-      return (
-        <group position={position} rotation={rotation}>
-          <mesh onClick={() => setSelectedZone(zone)}>
-            <boxGeometry args={[width, height, 0.1]} />
-            <meshStandardMaterial {...getZoneMaterial(zone)} side={2} />
-            <Edges color="#999" />
-          </mesh>
-          {[...Array(3)].map((_, i) => (
-            <mesh key={i} position={[(i - 1) * (width / 3), 0, 0.06]}>
-              <boxGeometry args={[0.02, height - 0.2, 0.01]} />
-              <meshStandardMaterial color="#ccc" />
-            </mesh>
           ))}
         </group>
       );
@@ -181,35 +170,41 @@ export default function Elevator3D() {
       height,
       rotation,
       visible = true,
-      zone,
+      zone, // 'A', 'B', or 'C'
     }) => {
       if (!visible) return null;
+      const panelCount = 5;
       return (
         <group position={position} rotation={rotation}>
-          <mesh onClick={() => setSelectedZone(zone)}>
+          {/* Main wall background - clickable for whole wall */}
+          <mesh onClick={() => handleZoneSelect(zone)}>
             <boxGeometry args={[width, height, 0.08]} />
             <meshStandardMaterial {...getZoneMaterial(zone)} side={2} />
           </mesh>
-          {[...Array(8)].map((_, i) => {
-            const subPanel = i < 3 ? "1" : i < 6 ? "2" : "3";
+
+          {/* Individual panels - 5 clickable sub-panels (e.g., A1 to A5) */}
+          {[...Array(panelCount)].map((_, i) => {
+            const subPanel = zone + (i + 1).toString(); // e.g., 'A1', 'A2'
             return (
               <mesh
                 key={i}
-                position={[0, height / 2 - (i + 0.5) * (height / 8), 0.045]}
+                position={[
+                  0,
+                  height / 2 - (i + 0.5) * (height / panelCount),
+                  0.045,
+                ]}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedZone(subPanel);
                 }}
               >
-                <boxGeometry args={[width - 0.1, height / 8 - 0.05, 0.001]} />
+                <boxGeometry
+                  args={[width - 0.1, height / panelCount - 0.05, 0.001]}
+                />
                 <meshStandardMaterial {...getZoneMaterial(subPanel)} />
               </mesh>
             );
           })}
-          <mesh position={[0, 0, 0.046]}>
-            <boxGeometry args={[0.015, height - 0.1, 0.001]} />
-            <meshStandardMaterial map={textures.stainless} />
-          </mesh>
         </group>
       );
     };
@@ -222,14 +217,32 @@ export default function Elevator3D() {
           position={getCameraPosition()}
           fov={60}
         />
-        <ambientLight intensity={4.5} />
-        <directionalLight position={[5, 8, 5]} intensity={2.8} castShadow />
-        <directionalLight position={[-5, 8, -5]} intensity={1.5} />
-        <pointLight position={[0, 4, 0]} intensity={2.4} color="#fffbf0" />
+        {/* Realistic, professional elevator lighting - no green tint, soft & elegant */}
+        <ambientLight intensity={0.25} />
 
+        <directionalLight
+          position={[4, 10, 6]}
+          intensity={0.7}
+          castShadow
+          shadow-mapSize={[2048, 2048]}
+        />
+
+        <directionalLight position={[-4, 8, -4]} intensity={0.4} />
+
+        {/* Soft natural sky/ground light - neutral tones, no green! */}
+        <hemisphereLight
+          intensity={0.35}
+          color="#ffffff" // Pure white sky
+          groundColor="#d0d0d0" // Soft gray ground reflection
+        />
+
+        {/* Environment map for perfect metal reflections - indoor luxury */}
+        <Environment preset="city" background={false} />
+        {/* "city" gives clean, subtle reflections - better than "lobby" for no color cast */}
+        {/* Indoor reflections without changing background */}
         <group rotation={getCameraRotation()}>
           {/* Back Wall - Zone A */}
-          <WallPanel
+          <WoodPanel
             position={[0, 2, -2]}
             width={4}
             height={5}
@@ -237,13 +250,14 @@ export default function Elevator3D() {
             visible={true}
           />
 
-          {/* Right Wall - Zone B (with sub-panels) */}
+          {/* Right Wall - Zone B */}
           <WoodPanel
             position={[2.05, 2, -0.5]}
             width={3}
             height={5}
             rotation={[0, -Math.PI / 2, 0]}
             zone="B"
+            visible={true}
           />
 
           {/* Left Wall - Zone C */}
@@ -258,7 +272,7 @@ export default function Elevator3D() {
 
           {/* Floor - Zone D */}
           <group position={[0, -0.35, -0.5]}>
-            <mesh receiveShadow onClick={() => setSelectedZone("D")}>
+            <mesh receiveShadow onClick={() => handleZoneSelect("D")}>
               <boxGeometry args={[4, 0.1, 3]} />
               <meshStandardMaterial {...getZoneMaterial("D")} />
               <Edges color="#ccc" />
@@ -268,69 +282,8 @@ export default function Elevator3D() {
           {/* Ceiling - Zone E */}
           <CeilingPanel position={[0, 4.45, -0.5]} />
 
-          {/* Button Panel - Zone H */}
-          {/* <group position={[1.85, 2, -1.75]}>
-            <mesh castShadow onClick={() => setSelectedZone("H")}>
-              <boxGeometry args={[0.35, 1.4, 0.08]} />
-              <meshStandardMaterial
-                {...getZoneMaterial("H")}
-                metalness={0.4}
-                roughness={0.6}
-              />
-              <Edges color="#aaa" />
-            </mesh>
-            <mesh position={[0.02, 0, 0.03]}>
-              <boxGeometry args={[0.32, 1.35, 0.02]} />
-              <meshStandardMaterial color="#999" />
-            </mesh>
-            <mesh position={[0.02, 0.5, 0.04]}>
-              <boxGeometry args={[0.22, 0.3, 0.01]} />
-              <meshStandardMaterial color="#1a3a5a" />
-            </mesh>
-            <mesh position={[0.02, 0.5, 0.045]}>
-              <boxGeometry args={[0.18, 0.25, 0.005]} />
-              <meshStandardMaterial
-                color="#4a8fff"
-                emissive="#4a8fff"
-                emissiveIntensity={0.8}
-              />
-            </mesh>
-            {[...Array(12)].map((_, i) => {
-              const row = Math.floor(i / 2);
-              const col = i % 2;
-              return (
-                <mesh
-                  key={i}
-                  position={[
-                    0.02 + (col - 0.5) * 0.12,
-                    0.15 - row * 0.14,
-                    0.045,
-                  ]}
-                  castShadow
-                >
-                  <cylinderGeometry args={[0.035, 0.035, 0.015, 16]} />
-                  <meshStandardMaterial
-                    color={i === 0 ? "#4a9eff" : "#3a3a3a"}
-                    metalness={0.7}
-                    roughness={0.3}
-                    emissive={i === 0 ? "#4a9eff" : "#000"}
-                    emissiveIntensity={i === 0 ? 0.6 : 0}
-                  />
-                </mesh>
-              );
-            })}
-            <mesh position={[0.02, -0.6, 0.045]}>
-              <cylinderGeometry args={[0.04, 0.04, 0.02, 16]} />
-              <meshStandardMaterial
-                color="#cc0000"
-                emissive="#cc0000"
-                emissiveIntensity={0.5}
-              />
-            </mesh>
-          </group> */}
-
           {/* Accent Strip Right - Zone F */}
-          <mesh position={[2.01, 2, 0.6]} onClick={() => setSelectedZone("F")}>
+          {/* <mesh position={[2.01, 2, 0.6]} onClick={() => handleZoneSelect("F")}>
             <boxGeometry args={[0.08, 4.5, 0.02]} />
             <meshStandardMaterial
               {...getZoneMaterial("F")}
@@ -338,13 +291,13 @@ export default function Elevator3D() {
               roughness={0.3}
               emissiveIntensity={0.3}
             />
-          </mesh>
+          </mesh> */}
 
           {/* Accent Strip Left - Zone G */}
-          {viewMode !== "front" && (
+          {/* {viewMode !== "front" && (
             <mesh
               position={[-2.01, 2, 0.6]}
-              onClick={() => setSelectedZone("G")}
+              onClick={() => handleZoneSelect("G")}
             >
               <boxGeometry args={[0.08, 4.5, 0.02]} />
               <meshStandardMaterial
@@ -354,27 +307,7 @@ export default function Elevator3D() {
                 emissiveIntensity={0.3}
               />
             </mesh>
-          )}
-
-          {/* Handrails */}
-          <mesh position={[1.95, 1.1, -0.5]}>
-            <boxGeometry args={[0.05, 0.08, 2.8]} />
-            <meshStandardMaterial
-              color="#c0c0c0"
-              metalness={0.8}
-              roughness={0.2}
-            />
-          </mesh>
-          {viewMode !== "front" && (
-            <mesh position={[-1.95, 1.1, -0.5]}>
-              <boxGeometry args={[0.05, 0.08, 2.8]} />
-              <meshStandardMaterial
-                color="#c0c0c0"
-                metalness={0.8}
-                roughness={0.2}
-              />
-            </mesh>
-          )}
+          )} */}
         </group>
       </>
     );
@@ -471,7 +404,7 @@ export default function Elevator3D() {
               {zones.slice(0, 4).map((zone) => (
                 <button
                   key={zone}
-                  onClick={() => setSelectedZone(zone)}
+                  onClick={() => handleZoneSelect(zone)}
                   style={{
                     padding: "12px",
                     background: selectedZone === zone ? "#7bc043" : "white",
@@ -497,7 +430,7 @@ export default function Elevator3D() {
               {zones.slice(4).map((zone) => (
                 <button
                   key={zone}
-                  onClick={() => setSelectedZone(zone)}
+                  onClick={() => handleZoneSelect(zone)}
                   style={{
                     padding: "12px",
                     background: selectedZone === zone ? "#7bc043" : "white",
@@ -515,33 +448,44 @@ export default function Elevator3D() {
             </div>
           </div>
 
-          <div style={{ marginBottom: "20px" }}>
-            <div
-              style={{ fontSize: "11px", color: "#666", marginBottom: "10px" }}
-            >
-              SUB-PANELS
+          {/* Sub-panels only show when a wall (A/B/C) is selected */}
+          {currentWall && (
+            <div style={{ marginBottom: "20px" }}>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "#666",
+                  marginBottom: "10px",
+                }}
+              >
+                SUB-PANELS for {currentWall}
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                {subPanels.map((num) => {
+                  const subZone = currentWall + num;
+                  return (
+                    <button
+                      key={num}
+                      onClick={() => handleSubPanelSelect(num)}
+                      style={{
+                        padding: "12px 20px",
+                        background:
+                          selectedZone === subZone ? "#7bc043" : "white",
+                        color: selectedZone === subZone ? "white" : "#333",
+                        border: "2px solid #ddd",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {num}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              {subPanels.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setSelectedZone(num)}
-                  style={{
-                    padding: "12px 20px",
-                    background: selectedZone === num ? "#7bc043" : "white",
-                    color: selectedZone === num ? "white" : "#333",
-                    border: "2px solid #ddd",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
           {selectedZone && (
             <div
